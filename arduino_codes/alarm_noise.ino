@@ -1,3 +1,5 @@
+//this code makes alarm noise
+
 const int buzzer = 9;
 
 void setup() {
