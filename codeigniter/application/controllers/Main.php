@@ -11,8 +11,4 @@ class Main extends CI_Controller {
 		$this->load->view('index');
 	}
         
-        public function login()
-	{
-		echo"login function";
-	}
 }
