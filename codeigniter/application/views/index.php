@@ -64,7 +64,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	</div>
 	<div id="body">
             <p>Username and password slots here</p>
-            <p>Login button.</p>
+            <a href="/index.php/tracker">Login</a>
+            
 	</div>
 
 </div>

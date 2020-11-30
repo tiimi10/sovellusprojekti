@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    
+ 
 <?php 
+    echo  "<a href='$link'>$message</a> ";
     echo $map['js']; 
 ?>
     

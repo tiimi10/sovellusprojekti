@@ -1,5 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+session_start();
+$_SESSION["idUser"] = 2;
+$_SESSION["idDevice"] = 0;
 
 class Main extends CI_Controller {
 

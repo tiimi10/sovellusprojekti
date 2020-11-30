@@ -15,7 +15,6 @@
     <tr>
         <th>Location ID</th>
         <th>Date and time</th>
-        <th>trackId</th>
         <th>Location</th>
 
         </tr>";
@@ -24,8 +23,7 @@
             {
                 echo "<tr>";
                 echo "<td> $row->logID </td>";
-                echo "<td> $row->logDateTime </td>";
-                echo "<td> $row->trackID </td>"; 
+                echo "<td> $row->logDateTime </td>"; 
                 echo "<td> $row->location </td>";
                 echo "</tr>";
             }
