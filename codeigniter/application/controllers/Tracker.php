@@ -11,14 +11,14 @@ class Tracker extends CI_Controller {
                 $userdata = $this->getUsers();
                 $locationdata = $this->getLocationHistory();
                 $mapdata = $this->mapLine();
-		$this->load->view('tracker');
-                $this->load->view('tracker_users', $userdata);
-                $this->load->view('tracker_devices', $devicedata);
+		$this->load->view('tracker_page/index');
+                $this->load->view('tracker_page/users', $userdata);
+                $this->load->view('tracker_page/devices', $devicedata);
                 if (count ($locationdata['locations'])){
-                    $this->load->view('tracker_locations', $locationdata);
+                    $this->load->view('tracker_page/locations', $locationdata);
                 }
                 if ($mapdata){
-                    $this->load->view('tracker_map', $mapdata);
+                    $this->load->view('tracker_page/map', $mapdata);
                 }
                 
 	}
@@ -110,14 +110,14 @@ class Tracker extends CI_Controller {
                 $devicedata = $this->getDevices();
                 $userdata = $this->getUsers();
                 $locationdata = $this->getLocationHistory();
-		$this->load->view('tracker');
-                $this->load->view('tracker_users', $userdata);
-                $this->load->view('tracker_devices', $devicedata);
+		$this->load->view('tracker_page/index');
+                $this->load->view('tracker_page/users', $userdata);
+                $this->load->view('tracker_page/devices', $devicedata);
                 if (count ($locationdata['locations'])){
-                    $this->load->view('tracker_locations', $locationdata);
+                    $this->load->view('tracker_page/locations', $locationdata);
                 }
                 if (count($mapdata['points'])){              
-                    $this->load->view('tracker_map', $data);
+                    $this->load->view('tracker_page/map', $data);
                 }
         }
         
