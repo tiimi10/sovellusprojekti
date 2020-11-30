@@ -27,6 +27,8 @@ void loraSetup()
 
   //transmit a startup message
   myLora.tx("TTN Mapper on TTN Enschede node");
+
+  myLora.sleep(6000);
 }
 
 void initialize_radio()
@@ -113,6 +115,29 @@ void initialize_radio()
   }
   Serial.println("Successfully joined TTN");
 }
+
+void sendMessage(const String message)
+{
+  //yritetään lähettää viesti
+  loraSerial.listen(); //pitää kuunnella Loraa
+  if(message == "Location NULL" || message == "INVALID" )
+  {
+    //Ei lähetetä mitään vielä
+    Serial.print(F("Loralle ei lähetetä mitään vielä, sillä message on: "));
+    Serial.println(message);
+  }
+  else
+  {
+    //lähetä viesti
+    Serial.println(F("Loralle lähetetään"));
+    Serial.println(message);
+    myLora.tx(message);
+  }
+
+  //Lora nukkumaan, että ei törkeenä viestei
+  myLora.sleep(6000);
+}
+
 
 //Lora needs function that asks from database, if device is stolen or safe. 1 = safe, 0 = stolen
 //function returns boolean result. If there is no result... device assumes, it is safe, return 1

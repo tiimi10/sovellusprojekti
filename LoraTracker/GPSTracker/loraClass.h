@@ -16,3 +16,4 @@
 
 void loraSetup();
 void initialize_radio();
+void sendMessage(const String message);

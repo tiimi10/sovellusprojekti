@@ -47,8 +47,8 @@
 boolean safe = 1;
 boolean moving = 0;
 
-int oldLocation; //what is the old location
-int newLocation; //current location to compare with old location
+String oldLocation; //what is the old location
+String newLocation; //current location to compare with old location
 int countTinyChange; //if certain amount of tiny location change happen
                      //ask lora if standing still.
 
@@ -68,5 +68,8 @@ void trackerStart()
 void trackerRun()
 {
   //What tracker should do and maintain itself?
-  getLocation(); //now always printing location
+  newLocation = getLocationData(); //now always printing location
+
+  sendMessage(newLocation);
+  delay(6000); //ei spämmiä
 }
