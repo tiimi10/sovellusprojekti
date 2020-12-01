@@ -53,6 +53,7 @@ void initialize_radio()
     delay(10000);
     hweui = myLora.hweui();
   }
+  
 
   //print out the HWEUI so that we can register it via ttnctl
   Serial.println("When using OTAA, register this DevEUI: ");
@@ -80,7 +81,15 @@ void initialize_radio()
      * If you are using OTAA, paste the example code from the TTN console here:
      */
     const char *appEui = "70B3D57ED00001A6";
-    const char *appKey = "90B5E34281F9D9B2D532CB03B594381E";
+    if (myLora.hweui() == "0004A30B001C5648")
+    {
+      const char *appKey = "90B5E34281F9D9B2D532CB03B594381E";
+    }
+    else
+    {
+      //testilaite 1
+      const char *appKey = "19D34BB487D2E48C32E296EDEFA0E4EB";
+    }
   
     join_result = myLora.initOTAA(appEui, appKey);
     Serial.println("UsingOTAA");
