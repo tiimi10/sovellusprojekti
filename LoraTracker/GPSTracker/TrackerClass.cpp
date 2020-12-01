@@ -48,9 +48,10 @@ boolean safe = 1;
 boolean moving = 0;
 
 String oldLocation; //what is the old location
-String newLocation; //current location to compare with old location
+String newLocation; //New location
+String locationStatus = String("INVALID"); //Location status
 int countTinyChange; //if certain amount of tiny location change happen
-                     //ask lora if standing still.
+                     //status change to not moving
 
 
 void trackerStart()
@@ -59,6 +60,7 @@ void trackerStart()
 
   loraSetup(); //start lora
 
+  locationStatus = String("Location NULL");
   //Device should check if status is set safe or stolen at database
   //use Lora
 
@@ -68,8 +70,39 @@ void trackerStart()
 void trackerRun()
 {
   //What tracker should do and maintain itself?
-  newLocation = getLocationData(); //now always printing location
 
-  sendMessage(newLocation);
-  delay(6000); //ei spämmiä
+  //Get new location only if it is invalid
+  if(locationStatus == "INVALID" || locationStatus == "Location NULL")
+  delay(500); //time for gps
+  {
+    locationStatus = getLocationData(); //Get location DATA
+
+    if(!(locationStatus == "INVALID" || locationStatus == "Location NULL"))
+    {
+      newLocation = locationStatus;
+      //Compare old location to new... shall send?
+      //If not send, change locationstatus to
+      //Location OLD
+      //if not old, make oldLocation NewLocation
+    }
+  }
+
+  if(!(locationStatus == "INVALID" || locationStatus == "Location NULL" || locationStatus == "OLD" || locationStatus == "SENT"))
+  {
+    locationStatus = sendMessage(locationStatus);
+  }
+
+  if(locationStatus == "SENT" || locationStatus == "OLD")
+  {
+    //60000 = 1 min
+    //300000 = 5 min
+    //600000 = 10 min
+    //900000 = 15 min
+    long sleepTime = 600000;
+    loraSleep(sleepTime); //10 min
+    locationStatus = String("Location NULL");
+    delay(sleepTime); //for now the same
+  }
+  
+  
 }

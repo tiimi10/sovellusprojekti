@@ -33,23 +33,23 @@ String getLocationData()
   gpsSerial.listen(); //Vaihda kuunneltavaa porttia
   String locationData = String("Location NULL");
 
-  Serial.println("Odotetaan gps");
+  //Serial.println(F("getlocation starts"));
 
-  while (gpsSerial.available())
+  while (gpsSerial.available() >0)
   {
+    //Serial.println(F("whileee"));
     if (gps.encode(gpsSerial.read()))
     {
       if (gps.location.isValid())
       {
-        locationData = "Valid Location Available";
-        locationData = (gps.location.lat(), 6);
-        locationData = locationData + "," + (gps.location.lng(), 6);
-        Serial.println(F("noudetaan locatioDataa"));
+       // Serial.println(F("Getting Valid Location"));
+        locationData = String(gps.location.lat(), 6);
+        locationData = String(locationData + ", " + String(gps.location.lng(), 6));
       }
       else
       {
-        Serial.println(F("INVALID"));
-        locationData = "INVALID";
+       // Serial.println(F("INVALID"));
+        locationData = String("INVALID");
       }
       
     }
