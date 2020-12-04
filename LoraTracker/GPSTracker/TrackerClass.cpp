@@ -98,7 +98,7 @@ void trackerRun()
     //300000 = 5 min
     //600000 = 10 min
     //900000 = 15 min
-    long sleepTime = 600000;
+    long sleepTime = 300000;
     loraSleep(sleepTime); //10 min
     locationStatus = String("Location NULL");
     delay(sleepTime); //for now the same
