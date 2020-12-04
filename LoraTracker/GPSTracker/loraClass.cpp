@@ -25,8 +25,9 @@ void loraSetup()
 
   initialize_radio();
 
-  //transmit a startup message
-  myLora.tx("TTN Mapper on TTN Enschede node");
+ // myLora.tx("16.1234, 17.1234");
+
+  //myLora.sleep(5000);
 }
 
 void initialize_radio()
@@ -52,6 +53,7 @@ void initialize_radio()
     delay(10000);
     hweui = myLora.hweui();
   }
+  
 
   //print out the HWEUI so that we can register it via ttnctl
   Serial.println("When using OTAA, register this DevEUI: ");
@@ -74,34 +76,24 @@ void initialize_radio()
 
   //join_result = myLora.initABP(devAddr, appSKey, nwkSKey);
 
-  if(myLora.hweui()="0004A30B001C5648")
-  {
-    //If this device, using OTAA
     /*
      * OTAA: initOTAA(String AppEUI, String AppKey);
      * If you are using OTAA, paste the example code from the TTN console here:
      */
     const char *appEui = "70B3D57ED00001A6";
-    const char *appKey = "90B5E34281F9D9B2D532CB03B594381E";
+    const char *appKey;
+    if (myLora.hweui() == "0004A30B001C5648")
+    {
+      appKey = "90B5E34281F9D9B2D532CB03B594381E";
+    }
+    else
+    {
+      //testilaite 1
+      appKey = "19D34BB487D2E48C32E296EDEFA0E4EB";
+    }
   
     join_result = myLora.initOTAA(appEui, appKey);
     Serial.println("UsingOTAA");
-  }
-  else
-  {
-    //In other cases using this:
-    /*
-     * ABP: initABP(String addr, String AppSKey, String NwkSKey);
-     * Paste the example code from the TTN console here:
-     */
-    const char *devAddr = "02017201";
-    const char *nwkSKey = "AE17E567AECC8787F749A62F5541D522";
-    const char *appSKey = "8D7FFEF938589D95AAD928C2E2E7E48F";
-  
-    join_result = myLora.initABP(devAddr, appSKey, nwkSKey);
-    Serial.println("UsingABP");
-  }
-
   
 
 
@@ -113,6 +105,45 @@ void initialize_radio()
   }
   Serial.println("Successfully joined TTN");
 }
+
+String sendMessage(const String message)
+{
+
+  //lähetä viesti
+  loraSerial.listen(); //pitää kuunnella Loraa, jotta viesti lähtee
+  
+  Serial.println(F("Loralle lähetetään"));
+  Serial.println(String(message)); //why no message?
+
+  /* Need to join again? or not
+
+  initABP();
+
+  boolean join_result = myLora.init(); //Try join Lora
+  
+  while(!join_result)
+  {
+    Serial.println("Unable to join. Are your keys correct, and do you have TTN coverage?");
+    delay(60000); //delay a minute before retry
+    join_result = myLora.init();
+  }
+
+   */
+  
+  myLora.tx(String(message));
+  
+  delay(500); //time to send
+  //Lora nukkuman, että ei törkeenä viestei
+ // myLora.sleep(5000);
+  
+  return "SENT";
+}
+
+void loraSleep(long msTime)
+{
+  myLora.sleep(msTime);
+}
+
 
 //Lora needs function that asks from database, if device is stolen or safe. 1 = safe, 0 = stolen
 //function returns boolean result. If there is no result... device assumes, it is safe, return 1

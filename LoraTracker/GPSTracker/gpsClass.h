@@ -9,8 +9,9 @@
 #ifndef gpsClass_h
 #define gpsClass_h
 
+#include "Arduino.h"
+
 #endif //ends header
 
 void gpsSetup();
-void displayInfo();
-void getLocation();
+String getLocationData();

@@ -15,7 +15,9 @@
             {
                 echo " $row->nickname"; 
                 echo " ";
-                echo "<a href='/index.php/tracker/selectDevice/?idDev=$row->deviceID'>Show on map</a> <br> ";
+                echo "<a href='/index.php/tracker/selectDevice/?idDev=$row->deviceID'>Show on map</a>";
+                echo " ";
+                echo "<a href='/index.php/tracker/selectDevice/?idDev=$row->deviceID'>Mark as stolen</a> <br> ";
             }
     
 ?>

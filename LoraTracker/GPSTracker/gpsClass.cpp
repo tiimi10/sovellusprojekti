@@ -27,28 +27,32 @@ void gpsSetup()
   Serial.println("Startup");
 }
 
-void displayInfo()
+String getLocationData()
 {
-  gpsSerial.listen();
-  Serial.print(F("Location: ")); 
-  if (gps.location.isValid())
-  {
-    Serial.print(gps.location.lat(), 6);
-    Serial.print(F(","));
-    Serial.println(gps.location.lng(), 6);
-  }
-  else
-  {
-    Serial.println(F("INVALID"));
-  }
-}
-
-void getLocation()
-{
+  //haetan lokaatiodataa
   gpsSerial.listen(); //Vaihda kuunneltavaa porttia
-  while (gpsSerial.available() >0)
-    if (gps.encode(gpsSerial.read()))
-      displayInfo();
-}
+  String locationData = String("Location NULL");
 
- 
+  //Serial.println(F("getlocation starts"));
+
+  while (gpsSerial.available() >0)
+  {
+    //Serial.println(F("whileee"));
+    if (gps.encode(gpsSerial.read()))
+    {
+      if (gps.location.isValid())
+      {
+       // Serial.println(F("Getting Valid Location"));
+        locationData = String(gps.location.lat(), 6);
+        locationData = String(locationData + ", " + String(gps.location.lng(), 6));
+      }
+      else
+      {
+       // Serial.println(F("INVALID"));
+        locationData = String("INVALID");
+      }
+      
+    }
+  }
+  return locationData;
+}
