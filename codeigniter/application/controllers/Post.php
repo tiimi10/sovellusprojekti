@@ -19,14 +19,19 @@ class Post extends CI_Controller {
                 $data['time'] = $uplinkmessage['Time'];
                 $data['DevEUI'] = $uplinkmessage['DevEUI'];
                 $location_hex = $uplinkmessage['payload_hex']; 
-                print_r($location_hex);
+                //print_r($location_hex);
                 $decoderOutput = array();
-                exec('python /var/www/html/codeigniter/application/third_party/hex_decoder.py '.($location_hex) , $decoderOutput);
-                print_r($decoderOutput);
-                $data['location'] = $decoderOutput[0];
-                print_r($data['location']);
-                $this->load->model('usedb');
-		$this->usedb->addData($data);              
+                exec('python /home/team10/public_html/codeigniter/application/third_party/hex_decoder.py '.($location_hex) , $decoderOutput);
+                //print_r($decoderOutput);
+                if($decoderOutput == NULL)
+                {
+                    print_r('failed');
+                }else{
+                    $data['location'] = $decoderOutput[0];
+                    //print_r($data['location']);
+                    $this->load->model('usedb');
+                    $this->usedb->addData($data);  
+                }
 	}
         
         public function test()

@@ -105,6 +105,7 @@ void trackerRun()
     //600000 = 10 min
     //900000 = 15 min
     long sleepTime = 300000;
+<<<<<<< HEAD
 
     //Jos laite nyysitty, silloin nukututaan vähän
     if(safe == false)
@@ -112,6 +113,8 @@ void trackerRun()
       sleepTime = 60000; 
     }
     
+=======
+>>>>>>> cb617eb7cc5b55b4978266402a4e123e968974a1
     loraSleep(sleepTime); //10 min
     locationStatus = String("Location NULL");
     delay(sleepTime); //for now the same

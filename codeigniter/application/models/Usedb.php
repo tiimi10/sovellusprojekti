@@ -19,6 +19,17 @@ class Usedb extends CI_Model {
         return $results;        
     }
     
+    function getUser($data)
+    {
+        $query = $this->db->query("SELECT userID, name FROM userTable WHERE email = '".$this->db->escape_str($data['idUser'])."' and password = '".$this->db->escape_str($data['passwd'])."'")->result_array();
+        if($query == NULL){
+            return false;        
+        }else{
+            $results = $query[0];
+            return $results;  
+        }
+    }
+    
     function getDevices()
     {
         $query = $this->db->query("SELECT deviceID, ownerID, nickname, registerName FROM trackerTable WHERE ownerID = ".$this->db->escape_str($_SESSION["idUser"]));
@@ -28,14 +39,14 @@ class Usedb extends CI_Model {
     
     function getLocationHistory()
     {
-        $query = $this->db->query('SELECT logID, logDateTime, location FROM locationHistory WHERE trackID = '.$this->db->escape_str($_SESSION["idDevice"]));
+        $query = $this->db->query('SELECT logID, logDateTime, location FROM locationHistory WHERE trackID = '.$this->db->escape_str($_SESSION["idDevice"]).' ORDER BY logID DESC LIMIT 20');
         $results = $query->result();
         return $results;        
     }
     
     function getLocation()
     {
-        $query = $this->db->query('SELECT location FROM locationHistory WHERE trackID = '.$this->db->escape_str($_SESSION["idDevice"]));
+        $query = $this->db->query('SELECT location FROM locationHistory WHERE trackID = '.$this->db->escape_str($_SESSION["idDevice"]).' ORDER BY logID DESC LIMIT 20');
         $results = $query->result_array();
         $array = array();
 
@@ -49,7 +60,7 @@ class Usedb extends CI_Model {
     
     function getLocAndTime()
     {
-        $query = $this->db->query('SELECT logDateTime, location FROM locationHistory WHERE trackID = '.$this->db->escape_str($_SESSION["idDevice"]));
+        $query = $this->db->query('SELECT logDateTime, location FROM locationHistory WHERE trackID = '.$this->db->escape_str($_SESSION["idDevice"]).' ORDER BY logID DESC LIMIT 20');
         $results = $query->result_array();
         return $results;
     }
@@ -58,9 +69,14 @@ class Usedb extends CI_Model {
     {
         $this->load->database();
         $query =$this->db->query("SELECT deviceID FROM trackerTable WHERE registerName = ".$this->db->escape($data['DevEUI']))->result_array();
-        $devID = $query[0];
-        print_r($devID['deviceID']);
-        $this->db->query("INSERT INTO locationHistory VALUES (DEFAULT,".$this->db->escape($data['time']).", ".$this->db->escape($devID['deviceID'])." ," .$this->db->escape($data['location']).")");
+        if($query == NULL){
+            print_r('fail');        
+        }else{
+            $devID = $query[0];
+            print_r($devID);
+            print_r($devID['deviceID']);
+            $this->db->query("INSERT INTO locationHistory VALUES (DEFAULT,".$this->db->escape($data['time']).", ".$this->db->escape($devID['deviceID'])." ," .$this->db->escape($data['location']).")");
+        }
     }
     
     

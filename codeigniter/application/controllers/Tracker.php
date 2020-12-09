@@ -5,23 +5,43 @@ session_start();
 
 class Tracker extends CI_Controller {  
         
-	public function index() 
-	{               
-                $devicedata = $this->getDevices();
-                $userdata = $this->getUsers();
-                $locationdata = $this->getLocationHistory();
-                $mapdata = $this->mapLine();
-		$this->load->view('tracker_page/index');
-                $this->load->view('tracker_page/users', $userdata);
-                $this->load->view('tracker_page/devices', $devicedata);
-                if (count ($locationdata['locations'])){
-                    $this->load->view('tracker_page/locations', $locationdata);
+	/*public function index() 
+	{        
+                if(!isset($_SESSION['idUser'])){
+                    header("Location: /index.php/main");
+                }else{
+                    $devicedata = $this->getDevices();
+                    $userdata = $this->getUsers();
+                    $locationdata = $this->getLocationHistory();
+                    $mapdata = $this->mapLine();
+                    $this->load->view('tracker_page/index');
+                    $this->load->view('tracker_page/users', $userdata);
+                    $this->load->view('tracker_page/devices', $devicedata);
+                    if (count ($locationdata['locations'])){
+                        $this->load->view('tracker_page/locations', $locationdata);
+                    }
+                    if ($mapdata){
+                        $this->load->view('tracker_page/map', $mapdata);
+                    }
                 }
+                
+	}*/
+    
+        public function index() 
+	{        
+            if(!isset($_SESSION['idUser'])){
+                header("Location: /index.php/main");
+            }else{
+                $data = $this->getDevices();
+                $mapdata = $this->mapLine();
+                $this->load->view('tracker_page/tracker', $data);
                 if ($mapdata){
                     $this->load->view('tracker_page/map', $mapdata);
                 }
+            }
                 
 	}
+    
         
         public function selectDevice(){
             $_SESSION["idDevice"] = htmlspecialchars($_GET["idDev"]); 
@@ -91,7 +111,7 @@ class Tracker extends CI_Controller {
                 }
         }
         
-        public function mapMarkers()
+        /*public function mapMarkers()
         {
                 $this->load->library('googlemaps');
                 $config['zoom'] = 'auto';
@@ -116,6 +136,29 @@ class Tracker extends CI_Controller {
                 if (count ($locationdata['locations'])){
                     $this->load->view('tracker_page/locations', $locationdata);
                 }
+                if (count($mapdata['points'])){              
+                    $this->load->view('tracker_page/map', $data);
+                }
+        }*/
+        
+        public function mapMarkers()
+        {
+                $this->load->library('googlemaps');
+                $config['zoom'] = 'auto';
+                $this->googlemaps->initialize($config);              
+                $mapdata = $this->getLocAndTime();
+                foreach($mapdata['points'] as $point)
+                {                
+                    $marker = array();
+                    $marker['position'] = $point['location'];
+                    $marker['infowindow_content'] = $point['logDateTime'];
+                    $this->googlemaps->add_marker($marker);
+                }
+                $data['map'] = $this->googlemaps->create_map();
+                $data['message'] = 'Show line on map';
+                $data['link'] = '/index.php/tracker/';
+                $devicedata = $this->getDevices();
+                $this->load->view('tracker_page/tracker', $devicedata);
                 if (count($mapdata['points'])){              
                     $this->load->view('tracker_page/map', $data);
                 }
