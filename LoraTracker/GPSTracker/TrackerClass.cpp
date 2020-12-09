@@ -44,8 +44,10 @@
 #include "gpsClass.h"
 #include "loraClass.h"
 
-boolean safe = 1;
+boolean safe = true;
 boolean moving = 0;
+int DEBUG = 1;
+//Debug 1 = testaa stolen statusta
 
 String oldLocation; //what is the old location
 String newLocation; //New location
@@ -65,16 +67,20 @@ void trackerStart()
   //use Lora
 
   //get gps and send start location to database
+
+  //TESTI
+  safe = false;
 }
 
 void trackerRun()
 {
+  
   //What tracker should do and maintain itself?
 
   //Get new location only if it is invalid
   if(locationStatus == "INVALID" || locationStatus == "Location NULL")
-  delay(500); //time for gps
   {
+    delay(500); //time for gps
     locationStatus = getLocationData(); //Get location DATA
 
     if(!(locationStatus == "INVALID" || locationStatus == "Location NULL"))
@@ -98,11 +104,19 @@ void trackerRun()
     //300000 = 5 min
     //600000 = 10 min
     //900000 = 15 min
-    long sleepTime = 600000;
+    long sleepTime = 300000;
+
+    //Jos laite nyysitty, silloin nukututaan vähän
+    if(safe == false)
+    {
+      sleepTime = 60000; 
+    }
+    
     loraSleep(sleepTime); //10 min
     locationStatus = String("Location NULL");
     delay(sleepTime); //for now the same
   }
   
   
+  //readDownlink();
 }

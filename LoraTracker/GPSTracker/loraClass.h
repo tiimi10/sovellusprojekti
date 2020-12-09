@@ -18,3 +18,4 @@ void loraSetup();
 void initialize_radio();
 String sendMessage(const String message);
 void loraSleep(long msTime);
+void readDownlink();

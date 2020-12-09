@@ -114,21 +114,6 @@ String sendMessage(const String message)
   
   Serial.println(F("Loralle lähetetään"));
   Serial.println(String(message)); //why no message?
-
-  /* Need to join again? or not
-
-  initABP();
-
-  boolean join_result = myLora.init(); //Try join Lora
-  
-  while(!join_result)
-  {
-    Serial.println("Unable to join. Are your keys correct, and do you have TTN coverage?");
-    delay(60000); //delay a minute before retry
-    join_result = myLora.init();
-  }
-
-   */
   
   myLora.tx(String(message));
   
@@ -144,7 +129,218 @@ void loraSleep(long msTime)
   myLora.sleep(msTime);
 }
 
+void readDownlink()
+{
+    Serial.print("TXing");
+    myLora.txUncnf("!"); //one byte, blocking function
 
+    switch(myLora.txUncnf("!")) //one byte, blocking function
+    {
+      case TX_FAIL:
+      {
+        Serial.println("TX unsuccessful or not acknowledged");
+        break;
+      }
+      case TX_SUCCESS:
+      {
+        Serial.println("TX successful and acknowledged");
+        break;
+      }
+      case TX_WITH_RX:
+      {
+        String received = myLora.getRx();
+        //String received = "mac_rx 1 54657374696E6720313233";
+        //String received = "mac_rx 1 FF0101";
+        //byte testbytes = 0x6D6F696B6B61;
+        //received = "mac_rx F " + String(received);
+       // received = myLora.base16decode(received);
+        Serial.print("Received downlink: ");
+        Serial.println(received);
+        break;
+      }
+      default:
+      {
+        Serial.println("Unknown response from TX function");
+      }
+    }
+
+    //led_off();
+    delay(10000);
+}
+/*
+txGet(const String& command, const String& data, bool shouldEncode)
+{
+  bool send_success = false;
+  uint8_t busy_count = 0;
+  uint8_t retry_count = 0;
+
+  //clear serial buffer
+  while(_serial.available())
+    _serial.read();
+
+  while(!send_success)
+  {
+    //retransmit a maximum of 10 times
+    retry_count++;
+    if(retry_count>10)
+    {
+      return TX_FAIL;
+    }
+
+    _serial.print(command);
+    if(shouldEncode)
+    {
+      sendEncoded(data);
+    }
+    else
+    {
+      _serial.print(data);
+    }
+    _serial.println();
+
+    String receivedData = _serial.readStringUntil('\n');
+    //TODO: Debug print on receivedData
+
+    switch (determineReceivedDataType(receivedData))
+    {
+      case rn2xx3::ok:
+      {
+        _serial.setTimeout(30000);
+        receivedData = _serial.readStringUntil('\n');
+        _serial.setTimeout(2000);
+
+        //TODO: Debug print on receivedData
+
+        switch (determineReceivedDataType(receivedData))
+        {
+          case rn2xx3::mac_tx_ok:
+          {
+            //SUCCESS!!
+            send_success = true;
+            return TX_SUCCESS;
+          }
+
+          case rn2xx3::mac_rx:
+          {
+            //example: mac_rx 1 54657374696E6720313233
+            _rxMessenge = receivedData.substring(receivedData.indexOf(' ', 7)+1);
+            send_success = true;
+            return TX_WITH_RX;
+          }
+
+          case rn2xx3::mac_err:
+          {
+            init();
+            break;
+          }
+
+          case rn2xx3::invalid_data_len:
+          {
+            //this should never happen if the prototype worked
+            send_success = true;
+            return TX_FAIL;
+          }
+
+          case rn2xx3::radio_tx_ok:
+          {
+            //SUCCESS!!
+            send_success = true;
+            return TX_SUCCESS;
+          }
+
+          case rn2xx3::radio_err:
+          {
+            //This should never happen. If it does, something major is wrong.
+            init();
+            break;
+          }
+
+          default:
+          {
+            //unknown response
+            //init();
+          }
+        } // End while after "ok"
+        break;
+      }
+
+      case rn2xx3::invalid_param:
+      {
+        //should not happen if we typed the commands correctly
+        send_success = true;
+        return TX_FAIL;
+      }
+
+      case rn2xx3::not_joined:
+      {
+        init();
+        break;
+      }
+
+      case rn2xx3::no_free_ch:
+      {
+        //retry
+        delay(1000);
+        break;
+      }
+
+      case rn2xx3::silent:
+      {
+        init();
+        break;
+      }
+
+      case rn2xx3::frame_counter_err_rejoin_needed:
+      {
+        init();
+        break;
+      }
+
+      case rn2xx3::busy:
+      {
+        busy_count++;
+
+        // Not sure if this is wise. At low data rates with large packets
+        // this can perhaps cause transmissions at more than 1% duty cycle.
+        // Need to calculate the correct constant value.
+        // But it is wise to have this check and re-init in case the
+        // lorawan stack in the RN2xx3 hangs.
+        if(busy_count>=10)
+        {
+          init();
+        }
+        else
+        {
+          delay(1000);
+        }
+        break;
+      }
+
+      case rn2xx3::mac_paused:
+      {
+        init();
+        break;
+      }
+
+      case rn2xx3::invalid_data_len:
+      {
+        //should not happen if the prototype worked
+        send_success = true;
+        return TX_FAIL;
+      }
+
+      default:
+      {
+        //unknown response after mac tx command
+        init();
+        break;
+      }
+    }
+  }
+
+  return TX_FAIL; //should never reach this
+}
+*/
 //Lora needs function that asks from database, if device is stolen or safe. 1 = safe, 0 = stolen
 //function returns boolean result. If there is no result... device assumes, it is safe, return 1
 
