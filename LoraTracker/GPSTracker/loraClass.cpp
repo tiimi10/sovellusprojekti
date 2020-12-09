@@ -189,7 +189,7 @@ int readDownlink(String downmessage)
 
 int getMessageInt()
 {
-  return 8;
+  return txInt;
 }
 
 //Lora needs function that asks from database, if device is stolen or safe. 1 = safe, 0 = stolen

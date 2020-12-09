@@ -46,7 +46,7 @@
 
 boolean safe = true;
 boolean moving = 0;
-int DEBUG = 1;
+//int DEBUG = 1;
 //Debug 1 = testaa stolen statusta
 
 String oldLocation; //what is the old location
@@ -103,9 +103,19 @@ void trackerRun()
     //kyseisen intin saa funktiolla getMessageInt()
     //esim
     int X = getMessageInt();
-    Serial.println(X);
 
+    if(X == 1)
+    {
+      //Jos X = 1, laite on safe tilassa, jolloinka se lähettää dataa hitaammin
+      safe = true;
+    }
+
+    else if (X == 0)
+    {
+     safe = false;
+    }
   }
+
 
   if(locationStatus == "SENT" || locationStatus == "OLD")
   {
@@ -113,12 +123,12 @@ void trackerRun()
     //300000 = 5 min
     //600000 = 10 min
     //900000 = 15 min
-    long sleepTime = 300000;
+    long sleepTime = 60000;
 
     //Jos laite nyysitty, silloin nukututaan vähän
     if(safe == false)
     {
-      sleepTime = 60000; 
+      sleepTime = 3000; 
     }
     
     loraSleep(sleepTime); //10 min
