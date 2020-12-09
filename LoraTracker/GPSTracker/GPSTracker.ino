@@ -6,9 +6,9 @@ void setup(){
 
 void loop()
 {
-  //trackerRun();
+  trackerRun();
   
   //TEST:::
-  readDownlink();
-  delay(30000);
+  //readDownlink();
+  //delay(30000);
 }

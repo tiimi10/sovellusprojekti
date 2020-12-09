@@ -68,8 +68,6 @@ void trackerStart()
 
   //get gps and send start location to database
 
-  //TESTI
-  safe = false;
 }
 
 void trackerRun()
@@ -96,6 +94,17 @@ void trackerRun()
   if(!(locationStatus == "INVALID" || locationStatus == "Location NULL" || locationStatus == "OLD" || locationStatus == "SENT"))
   {
     locationStatus = sendMessage(locationStatus);
+
+    //Kasperi
+    //Tässä kohtaa katso mitä txInt arvo on.
+    //Jos arvo on 0, merkiste laite nyysityksi safe = 0
+    //jos 1 merkitse laite safe = 1
+    //muussa tapauksessa ei täl kertaa tehdä mitään
+    //kyseisen intin saa funktiolla getMessageInt()
+    //esim
+    int X = getMessageInt();
+    Serial.println(X);
+
   }
 
   if(locationStatus == "SENT" || locationStatus == "OLD")
@@ -105,7 +114,6 @@ void trackerRun()
     //600000 = 10 min
     //900000 = 15 min
     long sleepTime = 300000;
-<<<<<<< HEAD
 
     //Jos laite nyysitty, silloin nukututaan vähän
     if(safe == false)
@@ -113,13 +121,9 @@ void trackerRun()
       sleepTime = 60000; 
     }
     
-=======
->>>>>>> cb617eb7cc5b55b4978266402a4e123e968974a1
     loraSleep(sleepTime); //10 min
     locationStatus = String("Location NULL");
     delay(sleepTime); //for now the same
   }
   
-  
-  //readDownlink();
 }

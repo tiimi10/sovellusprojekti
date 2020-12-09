@@ -9,7 +9,6 @@
 
 #include <rn2xx3.h>
 
-
 #endif //ends header
 
 //add function info here, so other classes can use them
@@ -18,4 +17,5 @@ void loraSetup();
 void initialize_radio();
 String sendMessage(const String message);
 void loraSleep(long msTime);
-void readDownlink();
+int readDownlink(String downMessage);
+int getMessageInt();
