@@ -5,27 +5,6 @@ session_start();
 
 class Tracker extends CI_Controller {  
         
-	/*public function index() 
-	{        
-                if(!isset($_SESSION['idUser'])){
-                    header("Location: /index.php/main");
-                }else{
-                    $devicedata = $this->getDevices();
-                    $userdata = $this->getUsers();
-                    $locationdata = $this->getLocationHistory();
-                    $mapdata = $this->mapLine();
-                    $this->load->view('tracker_page/index');
-                    $this->load->view('tracker_page/users', $userdata);
-                    $this->load->view('tracker_page/devices', $devicedata);
-                    if (count ($locationdata['locations'])){
-                        $this->load->view('tracker_page/locations', $locationdata);
-                    }
-                    if ($mapdata){
-                        $this->load->view('tracker_page/map', $mapdata);
-                    }
-                }
-                
-	}*/
     
         public function index() 
 	{        
@@ -34,9 +13,9 @@ class Tracker extends CI_Controller {
             }else{
                 $data = $this->getDevices();
                 $mapdata = $this->mapLine();
-                $this->load->view('tracker_page/tracker', $data);
+                $this->load->view('tracker', $data);
                 if ($mapdata){
-                    $this->load->view('tracker_page/map', $mapdata);
+                    $this->load->view('map', $mapdata);
                 }
             }
                 
@@ -46,6 +25,27 @@ class Tracker extends CI_Controller {
         public function selectDevice(){
             $_SESSION["idDevice"] = htmlspecialchars($_GET["idDev"]); 
             $this->index();
+        }
+        
+        public function selectStatus(){
+            $data["idDevice"] = htmlspecialchars($_GET["idDev"]); 
+            if (htmlspecialchars($_GET["status"]) == true){
+                $data["status"] = 0;
+            }else{
+                $data["status"] = 1;
+            } 
+            $this->load->model('usedb');
+            $this->usedb->setStatus($data);
+            $result = $this->usedb->getDeveuiAndStatus($data['idDevice']);
+            print_r($result);
+            header("Location: /index.php/post/downlink?deveui=".$result['registerName'].'&status='.$result['status']); 
+            //$this->index();
+        }
+        
+        public function showLocHistory(){
+            $_SESSION["idDevice"] = htmlspecialchars($_GET["idDev"]); 
+            $data = $this->getLocationHistory();
+            $this->load->view('locations', $data);
         }
         
         public function getUsers()
@@ -86,13 +86,7 @@ class Tracker extends CI_Controller {
                 $data['points'] = $this->usedb->getLocAndTime();               
                 return $data;
         }
-        
-        public function addData() 
-        {
-                $this->load->model('usedb');
-                $this->usedb->addData();
-        }
-        
+                
         public function mapLine()
         {
                 $this->load->library('googlemaps');
@@ -111,35 +105,6 @@ class Tracker extends CI_Controller {
                 }
         }
         
-        /*public function mapMarkers()
-        {
-                $this->load->library('googlemaps');
-                $config['zoom'] = 'auto';
-                $this->googlemaps->initialize($config);              
-                $mapdata = $this->getLocAndTime();
-                foreach($mapdata['points'] as $point)
-                {                
-                    $marker = array();
-                    $marker['position'] = $point['location'];
-                    $marker['infowindow_content'] = $point['logDateTime'];
-                    $this->googlemaps->add_marker($marker);
-                }
-                $data['map'] = $this->googlemaps->create_map();
-                $data['message'] = 'Show line on map';
-                $data['link'] = '/index.php/tracker/';
-                $devicedata = $this->getDevices();
-                $userdata = $this->getUsers();
-                $locationdata = $this->getLocationHistory();
-		$this->load->view('tracker_page/index');
-                $this->load->view('tracker_page/users', $userdata);
-                $this->load->view('tracker_page/devices', $devicedata);
-                if (count ($locationdata['locations'])){
-                    $this->load->view('tracker_page/locations', $locationdata);
-                }
-                if (count($mapdata['points'])){              
-                    $this->load->view('tracker_page/map', $data);
-                }
-        }*/
         
         public function mapMarkers()
         {
@@ -158,9 +123,9 @@ class Tracker extends CI_Controller {
                 $data['message'] = 'Show line on map';
                 $data['link'] = '/index.php/tracker/';
                 $devicedata = $this->getDevices();
-                $this->load->view('tracker_page/tracker', $devicedata);
+                $this->load->view('tracker', $devicedata);
                 if (count($mapdata['points'])){              
-                    $this->load->view('tracker_page/map', $data);
+                    $this->load->view('map', $data);
                 }
         }
         
