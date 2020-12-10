@@ -123,12 +123,12 @@ void trackerRun()
     //300000 = 5 min
     //600000 = 10 min
     //900000 = 15 min
-    long sleepTime = 60000;
+    long sleepTime = 600000;
 
     //Jos laite nyysitty, silloin nukututaan vähän
     if(safe == false)
     {
-      sleepTime = 3000; 
+      sleepTime = 60000; 
     }
     
     loraSleep(sleepTime); //10 min
