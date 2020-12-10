@@ -113,16 +113,13 @@ String sendMessage(const String message)
   loraSerial.listen(); //pitää kuunnella Loraa, jotta viesti lähtee
   
   Serial.println(F("Loralle lähetetään"));
-  Serial.println(String(message)); //why no message?
+  Serial.println(String(message));
   
-  myLora.tx(String(message));
   txInt = readDownlink(message);
   
   delay(500); //time to send
-  //Lora nukkuman, että ei törkeenä viestei
- // myLora.sleep(5000);
   
-  return "SENT";
+  return "SENT"; //Ilmoitetaan, et viesti lähetetty
 }
 
 void loraSleep(long msTime)
@@ -132,11 +129,11 @@ void loraSleep(long msTime)
 
 int readDownlink(String downmessage)
 {
-   // Serial.print("TXing");
-    //myLora.txUncnf("!"); //one byte, blocking function
+    myLora.tx(String(downmessage));
+    
     String received;
 
-    switch(myLora.txUncnf(downmessage)) //one byte, blocking function
+    switch(myLora.txUncnf(String(downmessage))) //one byte, blocking function
     {
       case TX_FAIL:
       {
@@ -151,11 +148,6 @@ int readDownlink(String downmessage)
       case TX_WITH_RX:
       {
         received = myLora.getRx();
-        //String received = "mac_rx 1 54657374696E6720313233";
-        //String received = "mac_rx 1 FF0101";
-        //byte testbytes = 0x6D6F696B6B61;
-        //received = "mac_rx F " + String(received);
-       // received = myLora.base16decode(received);
         Serial.print("Received downlink: ");
         Serial.println(received);
         break;
@@ -166,17 +158,17 @@ int readDownlink(String downmessage)
       }
     }
 
-    //led_off();
-    delay(10000);
-
-    if(received == "FF1010")
+    received.trim();
+    if(String(received) == "FF1010")
     {
       //laite on nyysitty
+      Serial.println("FF1010 on tunnistettu");
       return 0;
     }
-    else if (received == "FF0101")
+    else if (String(received) == "FF0101")
     {
       //In other cases we assume device is Safe
+      Serial.println("FF0101 on tunnistettu");
     return 1;
     } 
     else
@@ -185,6 +177,7 @@ int readDownlink(String downmessage)
     }
     //if we get here
     return 9;
+    
 }
 
 int getMessageInt()
