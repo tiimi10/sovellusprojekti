@@ -22,24 +22,23 @@ void loraSetup()
   //setup lora
   pinMode(loraRX, INPUT);
   pinMode(loraTX, OUTPUT);
+  pinMode(resetPin, OUTPUT);
   loraSerial.begin(loraBaud); //Loraport
 
-  loraSerial.listen(); //Listen Lora first
+  long retryTimeGeneral = 60000;
 
-  initialize_radio();
+  initialize_radio(retryTimeGeneral);
 
 }
 
-void initialize_radio()
+void initialize_radio(long retryTime)
 {
   //reset rn2483
-  pinMode(resetPin, OUTPUT);
   digitalWrite(resetPin, LOW);
   delay(500);
   digitalWrite(resetPin, HIGH);
 
-  delay(100); //wait for the RN2xx3's startup message
-  loraSerial.flush();
+  loraFlush();
 
   //Autobaud the rn2483 module to 9600. The default would otherwise be 57600.
   myLora.autobaud();
@@ -62,7 +61,7 @@ void initialize_radio()
   Serial.println(myLora.sysver());
 
   //configure your keys and join the network
-  Serial.println("Trying to join TTN");
+  Serial.println("Trying to join Digita Network");
   bool join_result = false;
 
 
@@ -99,11 +98,11 @@ void initialize_radio()
 
   while(!join_result)
   {
-    Serial.println("Unable to join. Are your keys correct, and do you have TTN coverage?");
-    delay(60000); //delay a minute before retry
+    Serial.println("Unable to join. Are your keys correct, and do you have LoRaWAN coverage?");
+    delay(retryTime); //delay a minute before retry
     join_result = myLora.init();
   }
-  Serial.println("Successfully joined TTN");
+  Serial.println("Successfully joined Digita Network");
 }
 
 String sendMessage(const String message)
@@ -122,6 +121,14 @@ String sendMessage(const String message)
   return "SENT"; //Ilmoitetaan, et viesti lähetetty
 }
 
+void loraFlush()
+{
+  loraSerial.listen(); //Listen Lora first
+
+  delay(100); //wait for the RN2xx3's startup message
+  loraSerial.flush();
+}
+
 void loraSleep(long msTime)
 {
   myLora.sleep(msTime);
@@ -129,7 +136,7 @@ void loraSleep(long msTime)
 
 int readDownlink(String downmessage)
 {
-    myLora.tx(String(downmessage));
+    //myLora.tx(String("test")); //this part might be useless
     
     String received;
 
@@ -138,6 +145,8 @@ int readDownlink(String downmessage)
       case TX_FAIL:
       {
         Serial.println("TX unsuccessful or not acknowledged");
+        loraFlush();
+        return 8;
         break;
       }
       case TX_SUCCESS:
@@ -155,6 +164,8 @@ int readDownlink(String downmessage)
       default:
       {
         Serial.println("Unknown response from TX function");
+        loraFlush();
+        return 8;
       }
     }
 
@@ -162,13 +173,13 @@ int readDownlink(String downmessage)
     if(String(received) == "FF1010")
     {
       //laite on nyysitty
-      Serial.println("FF1010 on tunnistettu");
+      Serial.println("Device is stolen!");
       return 0;
     }
     else if (String(received) == "FF0101")
     {
       //In other cases we assume device is Safe
-      Serial.println("FF0101 on tunnistettu");
+      Serial.println("Device is safe");
     return 1;
     } 
     else

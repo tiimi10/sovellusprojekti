@@ -46,14 +46,17 @@
 
 boolean safe = true;
 boolean moving = 0;
-//int DEBUG = 1;
-//Debug 1 = testaa stolen statusta
+int DEBUG = 1;
+//Debug 0 = normalrun
+//Debug 1 = testrun
 
 String oldLocation; //what is the old location
 String newLocation; //New location
 String locationStatus = String("INVALID"); //Location status
 int countTinyChange; //if certain amount of tiny location change happen
                      //status change to not moving
+
+long sleepTime; //needed for timings
 
 
 void trackerStart()
@@ -114,6 +117,11 @@ void trackerRun()
     {
      safe = false;
     }
+    else if (X==8)
+    {
+      initialize_radio(30000);
+      locationStatus = newLocation;
+    }
   }
 
 
@@ -123,14 +131,28 @@ void trackerRun()
     //300000 = 5 min
     //600000 = 10 min
     //900000 = 15 min
-    long sleepTime = 600000;
-
-    //Jos laite nyysitty, silloin nukututaan vähän
-    if(safe == false)
-    {
-      sleepTime = 60000; 
-    }
     
+    if(DEBUG == 0)
+    {
+      sleepTime = 600000; //normal sleeptimes
+  
+      //Jos laite nyysitty, silloin nukututaan vähän
+      if(safe == false)
+      {
+        sleepTime = 60000; //normal sleeptime
+      }
+    }
+    else
+    {
+      //käytetään test run aikoja
+      sleepTime = 60000; //tester times
+  
+      //Jos laite nyysitty, silloin nukututaan vähän
+      if(safe == false)
+      {
+        sleepTime = 30000; //tester times
+      }
+    }
     loraSleep(sleepTime); //10 min
     locationStatus = String("Location NULL");
     delay(sleepTime); //for now the same
