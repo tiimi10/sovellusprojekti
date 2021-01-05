@@ -1,14 +1,13 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 session_start();
-//$_SESSION["idUser"] = 2;
 $_SESSION["idDevice"] = 0;
-$_SESSION['message'] = NULL;
+//$_SESSION['message'] = "";
 
 class Main extends CI_Controller {
 
 	/**
-	 * Index Page.	 
+         * Login form and information about this project is shown in this main page	 
 	 */
 	public function index()
 	{   

@@ -5,6 +5,9 @@ session_start();
 
 class Tracker extends CI_Controller {  
         
+        /**
+        * Tracker page controller. 
+        */
     
         public function index() 
 	{        
@@ -20,8 +23,7 @@ class Tracker extends CI_Controller {
             }
                 
 	}
-    
-        
+           
         public function selectDevice(){
             $_SESSION["idDevice"] = htmlspecialchars($_GET["idDev"]); 
             $this->index();
@@ -37,25 +39,14 @@ class Tracker extends CI_Controller {
             $this->load->model('usedb');
             $this->usedb->setStatus($data);
             $result = $this->usedb->getDeveuiAndStatus($data['idDevice']);
-            print_r($result);
             header("Location: /index.php/post/downlink?deveui=".$result['registerName'].'&status='.$result['status']); 
-            //$this->index();
         }
         
         public function showLocHistory(){
             $_SESSION["idDevice"] = htmlspecialchars($_GET["idDev"]); 
             $data = $this->getLocationHistory();
             $this->load->view('locations', $data);
-        }
-        
-        public function getUsers()
-        {
-                //$user = $this->idUser;
-                $this->load->model('usedb');
-                $userdata['users'] = $this->usedb->getUsers();
-                //$this->load->view('tracker', $userdata);
-                return $userdata;
-        }
+        }       
         
         public function getDevices()
         {
@@ -68,7 +59,7 @@ class Tracker extends CI_Controller {
         public function getLocationHistory()
         {
                 $this->load->model('usedb');
-                $locationdata['locations'] = $this->usedb->getLocationHistory();
+                $locationdata['locations'] = $this->usedb->getLocation();
                 //$this->load->view('tracker', $devicedata);
                 return $locationdata;
         }
@@ -76,14 +67,23 @@ class Tracker extends CI_Controller {
         public function getLocation()
         {
                 $this->load->model('usedb');
-                $data['points'] = $this->usedb->getLocation();               
+                $results = $this->usedb->getLocation();
+                $array = array();
+
+                foreach ( $results as $key => $location )
+                {
+                    $temp = array_values($location);
+                    $array[] = $temp[2];
+                }
+                $data['points'] = $array;
+                
                 return $data;
         }
         
         public function getLocAndTime()
         {
                 $this->load->model('usedb');
-                $data['points'] = $this->usedb->getLocAndTime();               
+                $data['points'] = $this->usedb->getLocation();               
                 return $data;
         }
                 
