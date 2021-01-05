@@ -7,4 +7,8 @@ void setup(){
 void loop()
 {
   trackerRun();
+  
+  //TEST:::
+  //readDownlink();
+  //delay(30000);
 }

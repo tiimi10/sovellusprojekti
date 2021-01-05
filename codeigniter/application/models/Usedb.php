@@ -32,9 +32,21 @@ class Usedb extends CI_Model {
     
     function getDevices()
     {
-        $query = $this->db->query("SELECT deviceID, ownerID, nickname, registerName FROM trackerTable WHERE ownerID = ".$this->db->escape_str($_SESSION["idUser"]));
+        $query = $this->db->query("SELECT deviceID, ownerID, nickname, registerName, status FROM trackerTable WHERE ownerID = ".$this->db->escape_str($_SESSION["idUser"]));
         $results = $query->result();
         return $results;        
+    }
+    
+    function setStatus($data)
+    {
+        $this->db->query("UPDATE trackerTable SET status=".$this->db->escape_str($data["status"])." WHERE deviceID = ".$this->db->escape_str($data["idDevice"]));     
+    }
+    
+    function getDeveuiAndStatus($devid)
+    {
+        $query = $this->db->query("SELECT registerName, status FROM trackerTable WHERE deviceID = ".$this->db->escape_str($devid));
+        $results = $query->result_array();
+        return $results[0];        
     }
     
     function getLocationHistory()

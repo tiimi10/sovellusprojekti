@@ -44,14 +44,19 @@
 #include "gpsClass.h"
 #include "loraClass.h"
 
-boolean safe = 1;
+boolean safe = true;
 boolean moving = 0;
+int DEBUG = 1;
+//Debug 0 = normalrun
+//Debug 1 = testrun
 
 String oldLocation; //what is the old location
 String newLocation; //New location
 String locationStatus = String("INVALID"); //Location status
 int countTinyChange; //if certain amount of tiny location change happen
                      //status change to not moving
+
+long sleepTime; //needed for timings
 
 
 void trackerStart()
@@ -65,16 +70,18 @@ void trackerStart()
   //use Lora
 
   //get gps and send start location to database
+
 }
 
 void trackerRun()
 {
+  
   //What tracker should do and maintain itself?
 
   //Get new location only if it is invalid
   if(locationStatus == "INVALID" || locationStatus == "Location NULL")
-  delay(500); //time for gps
   {
+    delay(500); //time for gps
     locationStatus = getLocationData(); //Get location DATA
 
     if(!(locationStatus == "INVALID" || locationStatus == "Location NULL"))
@@ -90,7 +97,33 @@ void trackerRun()
   if(!(locationStatus == "INVALID" || locationStatus == "Location NULL" || locationStatus == "OLD" || locationStatus == "SENT"))
   {
     locationStatus = sendMessage(locationStatus);
+
+    //Kasperi
+    //Tässä kohtaa katso mitä txInt arvo on.
+    //Jos arvo on 0, merkiste laite nyysityksi safe = 0
+    //jos 1 merkitse laite safe = 1
+    //muussa tapauksessa ei täl kertaa tehdä mitään
+    //kyseisen intin saa funktiolla getMessageInt()
+    //esim
+    int X = getMessageInt();
+
+    if(X == 1)
+    {
+      //Jos X = 1, laite on safe tilassa, jolloinka se lähettää dataa hitaammin
+      safe = true;
+    }
+
+    else if (X == 0)
+    {
+     safe = false;
+    }
+    else if (X==8)
+    {
+      initialize_radio(30000);
+      locationStatus = newLocation;
+    }
   }
+
 
   if(locationStatus == "SENT" || locationStatus == "OLD")
   {
@@ -98,11 +131,31 @@ void trackerRun()
     //300000 = 5 min
     //600000 = 10 min
     //900000 = 15 min
-    long sleepTime = 300000;
+    
+    if(DEBUG == 0)
+    {
+      sleepTime = 600000; //normal sleeptimes
+  
+      //Jos laite nyysitty, silloin nukututaan vähän
+      if(safe == false)
+      {
+        sleepTime = 60000; //normal sleeptime
+      }
+    }
+    else
+    {
+      //käytetään test run aikoja
+      sleepTime = 60000; //tester times
+  
+      //Jos laite nyysitty, silloin nukututaan vähän
+      if(safe == false)
+      {
+        sleepTime = 30000; //tester times
+      }
+    }
     loraSleep(sleepTime); //10 min
     locationStatus = String("Location NULL");
     delay(sleepTime); //for now the same
   }
-  
   
 }

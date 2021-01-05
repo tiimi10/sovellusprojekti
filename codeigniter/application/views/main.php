@@ -6,7 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <title>Welcome</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="/application/third_party/w3.css">
+<link rel="stylesheet" href="/application/css/w3.css">
 <body>
     
 <!--navbar-->
@@ -36,26 +36,29 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   <div class="w3-container w3-padding-32" id="about">
     <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">About</h3>
     <h4 class="w3-border-light-grey w3-padding-12">IoT-device</h4>
-    <p>Microcontroller with gps-receiver and nb-iot transmitter.<br>
-        1. Device can collect gps-information.<br>
-        2. Device knows when owners mobile-phone is nearby<br>
-        3. Device can send collected data to the database in server <br>
-        4. Device can receive orders (make sound order so owner can find device)
+    <p>Microcontroller with gps-receiver and LoRa transmitter.<br>
+       -Device collects gps-location and sends collected data to the LoRaWAN-gateway <br>
+       -Device also can receive status information (stolen or safe) and make actions based on that.<br>
+       -If status is stolen, device starts sending location more often.
+    </p>
+    <h4 class="w3-border-light-grey w3-padding-12">Data transmission protocol</h4>
+    <p> -From LoRaWAN gateway, data will go to the thinkpark server. <br>
+        -In thinkpark-portal, we can monitor data and set our application server where it will be forwarded. <br>
+        -Location data and device information are transfered to our server with JSON-packets by HTTP POST-requests.<br>
+        -Downlink messages to the IoT-node (with status info) can be sent too with HTTP POST-requests.<br>
+        -Device only receives downlink messages when it sends uplink messages. This way we can save power.  
     </p>
     <h4 class="w3-border-light-grey w3-padding-12">Web-UI</h4>
-    <p>1. Can display sent information from database, ie locations on the map.<br>
-        2. The user can instruct the IoT device to beep. (IoT starts beeping)<br>
-        3. Can send alarm message if the device is stolern. The alarm message arrives, for example, in an e-mail or as a text message
+    <p>Web-page which shows location information and put locations also on the map.<br>
+       -There is main page with information about this project and login form.<br>
+       -After succesful login, you can see your devices and each ones location history.<br>
+       -You can mark device as stolen or safe and information goes to the device.
     </p>
-    <h4 class="w3-border-light-grey w3-padding-12">Data processing algorithm</h4>
-    <p>1. Server that runs database and web-UI and can process data coming from device.<br>
-        2. Database that stores collected data  <br>
-        3. Based on the information received, algorithm knows whether the device is stolen or not and issues an alarm.<br>
-        2. Location information from users mobile can be used too for the algorithm
-
-
-    </p>
-  </div>    
+  </div>
+  
+  <div class="w3-display-container w3-content w3-wide w3-padding-32"  >
+      <img src="/images/network_diagram.jpg" class="w3-image" style="width:100%">
+  </div>
   
   <!-- Login Section -->
   <div class="w3-container w3-padding-32" id="login">

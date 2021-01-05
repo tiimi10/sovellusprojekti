@@ -12,13 +12,13 @@ class Main extends CI_Controller {
 	 */
 	public function index()
 	{   
-                $this->load->view('index');
+                $this->load->view('main');
 	}
         
         public function login()
         {
                 $data['idUser'] = filter_input(INPUT_POST, 'user_name');
-                $data['passwd'] = $_POST['password'];
+                $data['passwd'] = filter_input(INPUT_POST, 'password');
                 $this->load->model('usedb');
                 $result = $this->usedb->getUser($data);                
                 if($result == false) 

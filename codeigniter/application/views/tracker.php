@@ -6,7 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <title>Tracker</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="/application/third_party/w3.css">
+<link rel="stylesheet" href="/application/css/w3.css">
 <body>
 
 <!--navbar-->
@@ -15,7 +15,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <a class="w3-bar-item"> Tracker</a>
     <!-- Float links to the right. Hide them on small screens -->
     <div class="w3-right">
-      <a href="#about" class="w3-bar-item w3-button">About</a>
       <a href="/index.php/main/logout" class="w3-bar-item w3-button">Log out</a>
     </div>
   </div>
@@ -38,21 +37,21 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     {?>
       <div class="w3-col 13 m6 w3-margin-bottom">
         <div class="w3-display-container w3-gray" style="min-width:200px" style="max-width:300px">
-          <div class="w3-black w3-padding"><?php echo " $row->nickname"; ?></div>
+          <div class="w3-black w3-padding"><?php echo " $row->nickname "; if($row->status == true){echo "  (STOLEN!)";} ?></div>
           <div class="w3-padding-36">
             <a href=<?php echo "/index.php/tracker/selectDevice/?idDev=$row->deviceID"; ?> class=" w3-bar-item w3-button w3-padding">Show on map</a>
           </div>
           <div class="w3-padding-36">
-            <a href="#about" class=" w3-bar-item w3-button w3-padding">Mark as stolen</a>
+            <a href=<?php echo "/index.php/tracker/selectStatus/?idDev=$row->deviceID&status=$row->status"; ?> class=" w3-bar-item w3-button w3-padding">Mark as <?php if($row->status == true){echo " safe";}else{echo "stolen";} ?></a>
           </div>
           <div class="w3-padding-36">
-            <a href="#about" class=" w3-bar-item w3-button w3-padding">Show location history</a>
+            <a href=<?php echo "/index.php/tracker/showLocHistory/?idDev=$row->deviceID"; ?> class=" w3-bar-item w3-button w3-padding">Show location history</a>
           </div>
         </div>
       </div>
     <?php
     }?>
-    
+       
 <p>
 </body>
 </html>

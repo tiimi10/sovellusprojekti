@@ -14,32 +14,31 @@ static const uint32_t loraBaud = 57600; //Lora BAUDS
 static const int resetPin = 13;
 rn2xx3 myLora(loraSerial);
 
+//message
+int txInt = 9; //if no downlink message
+
 void loraSetup()
 {
   //setup lora
   pinMode(loraRX, INPUT);
   pinMode(loraTX, OUTPUT);
+  pinMode(resetPin, OUTPUT);
   loraSerial.begin(loraBaud); //Loraport
 
-  loraSerial.listen(); //Listen Lora first
+  long retryTimeGeneral = 60000;
 
-  initialize_radio();
+  initialize_radio(retryTimeGeneral);
 
- // myLora.tx("16.1234, 17.1234");
-
-  //myLora.sleep(5000);
 }
 
-void initialize_radio()
+void initialize_radio(long retryTime)
 {
   //reset rn2483
-  pinMode(resetPin, OUTPUT);
   digitalWrite(resetPin, LOW);
   delay(500);
   digitalWrite(resetPin, HIGH);
 
-  delay(100); //wait for the RN2xx3's startup message
-  loraSerial.flush();
+  loraFlush();
 
   //Autobaud the rn2483 module to 9600. The default would otherwise be 57600.
   myLora.autobaud();
@@ -62,7 +61,7 @@ void initialize_radio()
   Serial.println(myLora.sysver());
 
   //configure your keys and join the network
-  Serial.println("Trying to join TTN");
+  Serial.println("Trying to join Digita Network");
   bool join_result = false;
 
 
@@ -99,11 +98,11 @@ void initialize_radio()
 
   while(!join_result)
   {
-    Serial.println("Unable to join. Are your keys correct, and do you have TTN coverage?");
-    delay(60000); //delay a minute before retry
+    Serial.println("Unable to join. Are your keys correct, and do you have LoRaWAN coverage?");
+    delay(retryTime); //delay a minute before retry
     join_result = myLora.init();
   }
-  Serial.println("Successfully joined TTN");
+  Serial.println("Successfully joined Digita Network");
 }
 
 String sendMessage(const String message)
@@ -113,30 +112,21 @@ String sendMessage(const String message)
   loraSerial.listen(); //pitää kuunnella Loraa, jotta viesti lähtee
   
   Serial.println(F("Loralle lähetetään"));
-  Serial.println(String(message)); //why no message?
-
-  /* Need to join again? or not
-
-  initABP();
-
-  boolean join_result = myLora.init(); //Try join Lora
+  Serial.println(String(message));
   
-  while(!join_result)
-  {
-    Serial.println("Unable to join. Are your keys correct, and do you have TTN coverage?");
-    delay(60000); //delay a minute before retry
-    join_result = myLora.init();
-  }
-
-   */
-  
-  myLora.tx(String(message));
+  txInt = readDownlink(message);
   
   delay(500); //time to send
-  //Lora nukkuman, että ei törkeenä viestei
- // myLora.sleep(5000);
   
-  return "SENT";
+  return "SENT"; //Ilmoitetaan, et viesti lähetetty
+}
+
+void loraFlush()
+{
+  loraSerial.listen(); //Listen Lora first
+
+  delay(100); //wait for the RN2xx3's startup message
+  loraSerial.flush();
 }
 
 void loraSleep(long msTime)
@@ -144,6 +134,67 @@ void loraSleep(long msTime)
   myLora.sleep(msTime);
 }
 
+int readDownlink(String downmessage)
+{
+    //myLora.tx(String("test")); //this part might be useless
+    
+    String received;
+
+    switch(myLora.txUncnf(String(downmessage))) //one byte, blocking function
+    {
+      case TX_FAIL:
+      {
+        Serial.println("TX unsuccessful or not acknowledged");
+        loraFlush();
+        return 8;
+        break;
+      }
+      case TX_SUCCESS:
+      {
+        Serial.println("TX successful and acknowledged");
+        break;
+      }
+      case TX_WITH_RX:
+      {
+        received = myLora.getRx();
+        Serial.print("Received downlink: ");
+        Serial.println(received);
+        break;
+      }
+      default:
+      {
+        Serial.println("Unknown response from TX function");
+        loraFlush();
+        return 8;
+      }
+    }
+
+    received.trim();
+    if(String(received) == "FF1010")
+    {
+      //laite on nyysitty
+      Serial.println("Device is stolen!");
+      return 0;
+    }
+    else if (String(received) == "FF0101")
+    {
+      //In other cases we assume device is Safe
+      Serial.println("Device is safe");
+    return 1;
+    } 
+    else
+    {
+      //In other cases we do not have actions
+    }
+    //if we get here
+    return 9;
+    
+}
+
+int getMessageInt()
+{
+  return txInt;
+}
 
 //Lora needs function that asks from database, if device is stolen or safe. 1 = safe, 0 = stolen
 //function returns boolean result. If there is no result... device assumes, it is safe, return 1
