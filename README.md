@@ -2,4 +2,4 @@
 
 
 Tietoliikenteen sovellusprojekti  
-gpstracker.gq
+http://gpstracker.gq
