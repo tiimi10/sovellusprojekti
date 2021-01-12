@@ -5,19 +5,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 //$db = db_connect();
 
 class Usedb extends CI_Model {
-       
+    
+    /**
+     * All database using is in this model
+     */
+    
     function __construct()
     {
         parent::__construct();
         $this->load->database();
-    }
-    
-    function getUsers()
-    {
-        $query = $this->db->query("SELECT userID, name, lastname, email, phonenumber FROM userTable WHERE userID = ".$this->db->escape_str($_SESSION["idUser"]));
-        $results = $query->result();
-        return $results;        
-    }
+    }    
     
     function getUser($data)
     {
@@ -47,32 +44,11 @@ class Usedb extends CI_Model {
         $query = $this->db->query("SELECT registerName, status FROM trackerTable WHERE deviceID = ".$this->db->escape_str($devid));
         $results = $query->result_array();
         return $results[0];        
-    }
+    }     
     
-    function getLocationHistory()
+    function getLocation ()
     {
-        $query = $this->db->query('SELECT logID, logDateTime, location FROM locationHistory WHERE trackID = '.$this->db->escape_str($_SESSION["idDevice"]).' ORDER BY logID DESC LIMIT 20');
-        $results = $query->result();
-        return $results;        
-    }
-    
-    function getLocation()
-    {
-        $query = $this->db->query('SELECT location FROM locationHistory WHERE trackID = '.$this->db->escape_str($_SESSION["idDevice"]).' ORDER BY logID DESC LIMIT 20');
-        $results = $query->result_array();
-        $array = array();
-
-        foreach ( $results as $key => $location )
-        {
-            $temp = array_values($location);
-            $array[] = $temp[0];
-        }
-        return $array;
-    }
-    
-    function getLocAndTime()
-    {
-        $query = $this->db->query('SELECT logDateTime, location FROM locationHistory WHERE trackID = '.$this->db->escape_str($_SESSION["idDevice"]).' ORDER BY logID DESC LIMIT 20');
+        $query = $this->db->query('SELECT logID, logDateTime, location FROM locationHistory WHERE trackID = '.$this->db->escape_str($_SESSION["idDevice"]).' ORDER BY logID DESC LIMIT 30');
         $results = $query->result_array();
         return $results;
     }

@@ -5,7 +5,7 @@
 <?php
 
 /* 
- * Page where is users and information about them
+ * Shows devices location history
  */
 
     echo "<table border='1'>
@@ -22,9 +22,9 @@
         foreach ($locations as $row)
             {
                 echo "<tr>";
-                echo "<td> $row->logID </td>";
-                echo "<td> $row->logDateTime </td>"; 
-                echo "<td> $row->location </td>";
+                echo "<td> ".$row['logID']." </td>";
+                echo "<td> ".$row['logDateTime']." </td>"; 
+                echo "<td> ".$row['location']." </td>";
                 echo "</tr>";
             }
             
