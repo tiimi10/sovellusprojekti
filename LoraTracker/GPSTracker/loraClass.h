@@ -15,7 +15,7 @@
 
 void loraSetup();
 void initialize_radio(long retryTime);
-String sendMessage(const String message);
+String sendMessage(String message);
 void loraSleep(long msTime);
 int readDownlink(String downMessage);
 int getMessageInt();

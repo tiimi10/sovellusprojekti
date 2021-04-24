@@ -5,13 +5,15 @@
  */
 
 #include "loraClass.h"
+#include "PiezoClass.h"
+#include "gpsClass.h"
 #include <SoftwareSerial.h>
 
 static const int loraRX = 10;
 static const int loraTX = 9; //Lora pins
 SoftwareSerial loraSerial(loraRX, loraTX);
 static const uint32_t loraBaud = 57600; //Lora BAUDS
-static const int resetPin = 13;
+static const int resetPin = 8;
 rn2xx3 myLora(loraSerial);
 
 //message
@@ -105,8 +107,12 @@ void initialize_radio(long retryTime)
   Serial.println("Successfully joined Digita Network");
 }
 
-String sendMessage(const String message)
+String sendMessage(String message)
 {
+  //Tarvitaan road conditio mukaan viestiin
+  int roadInt = Roadcondition();
+  int battery = random(0,101); //gives random number between 0 and 100
+  message = message + ", " + roadInt + ", " + battery;
 
   //lähetä viesti
   loraSerial.listen(); //pitää kuunnella Loraa, jotta viesti lähtee
@@ -186,6 +192,7 @@ int readDownlink(String downmessage)
     {
       //In other cases we do not have actions
     }
+    ResetPiezo();
     //if we get here
     return 9;
     

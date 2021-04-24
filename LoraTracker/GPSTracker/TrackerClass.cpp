@@ -40,12 +40,12 @@
  */
 
 #include "TrackerClass.h"
-
-#include "gpsClass.h"
 #include "loraClass.h"
+#include "gpsClass.h"
+#include "PiezoClass.h"
 
 boolean safe = true;
-boolean moving = 0;
+boolean nomovement = 0;
 int DEBUG = 1;
 //Debug 0 = normalrun
 //Debug 1 = testrun
@@ -53,23 +53,33 @@ int DEBUG = 1;
 String oldLocation; //what is the old location
 String newLocation; //New location
 String locationStatus = String("INVALID"); //Location status
-int countTinyChange; //if certain amount of tiny location change happen
-                     //status change to not moving
 
 long sleepTime; //needed for timings
+unsigned long timeCounter;
 
 
 void trackerStart()
 {
   gpsSetup(); //start gps first
-
   loraSetup(); //start lora
+  piezoSetup();
 
   locationStatus = String("Location NULL");
   //Device should check if status is set safe or stolen at database
   //use Lora
 
   //get gps and send start location to database
+
+  //Setup SleepTime
+  if(DEBUG == 0)
+    {
+      sleepTime = 60000; //normal sleeptimes
+    }
+    else
+    {
+      //käytetään test run aikoja
+      sleepTime = 30000; //tester times
+    }
 
 }
 
@@ -87,10 +97,6 @@ void trackerRun()
     if(!(locationStatus == "INVALID" || locationStatus == "Location NULL"))
     {
       newLocation = locationStatus;
-      //Compare old location to new... shall send?
-      //If not send, change locationstatus to
-      //Location OLD
-      //if not old, make oldLocation NewLocation
     }
   }
 
@@ -98,13 +104,6 @@ void trackerRun()
   {
     locationStatus = sendMessage(locationStatus);
 
-    //Kasperi
-    //Tässä kohtaa katso mitä txInt arvo on.
-    //Jos arvo on 0, merkiste laite nyysityksi safe = 0
-    //jos 1 merkitse laite safe = 1
-    //muussa tapauksessa ei täl kertaa tehdä mitään
-    //kyseisen intin saa funktiolla getMessageInt()
-    //esim
     int X = getMessageInt();
 
     if(X == 1)
@@ -122,40 +121,46 @@ void trackerRun()
       initialize_radio(30000);
       locationStatus = newLocation;
     }
+    loraSleep(sleepTime);
+    timeCounter = millis();
+    nomovement = true;
   }
 
 
   if(locationStatus == "SENT" || locationStatus == "OLD")
   {
+    //Testing if moving
+    boolean testMove = movementTest();
+    if(testMove)
+    {
+      //Piezossa liikettä
+      nomovement = false;
+    }
+    else if(!testMove)
+    {
+      //Piezossa ei liikettä, mutta ei lopeteta liikettä seinään.
+    }
+        
     //60000 = 1 min
     //300000 = 5 min
     //600000 = 10 min
     //900000 = 15 min
     
-    if(DEBUG == 0)
+    unsigned long currentTime = millis();
+    currentTime = currentTime - timeCounter;
+    if(currentTime > sleepTime && !nomovement)
     {
-      sleepTime = 600000; //normal sleeptimes
-  
-      //Jos laite nyysitty, silloin nukututaan vähän
-      if(safe == false)
-      {
-        sleepTime = 60000; //normal sleeptime
-      }
+      Serial.println("Laite liikkuu ja haetaan uus Locaatio");
+      //If sleepTime is over and tracker is moving, Back looking for location
+      locationStatus = String("Location NULL");
     }
-    else
+    else if (currentTime >sleepTime && nomovement)
     {
-      //käytetään test run aikoja
-      sleepTime = 60000; //tester times
-  
-      //Jos laite nyysitty, silloin nukututaan vähän
-      if(safe == false)
-      {
-        sleepTime = 30000; //tester times
-      }
+      loraSleep(sleepTime);
+      delay(sleepTime);
+      Serial.println("laite ei liikkunut lainkaan");
+      timeCounter = 0;
+      nomovement = true;
     }
-    loraSleep(sleepTime); //10 min
-    locationStatus = String("Location NULL");
-    delay(sleepTime); //for now the same
   }
-  
 }
