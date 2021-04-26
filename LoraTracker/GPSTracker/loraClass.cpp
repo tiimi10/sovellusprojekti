@@ -124,7 +124,7 @@ String sendMessage(String message)
   
   delay(500); //time to send
   
-  return "SENT"; //Ilmoitetaan, et viesti lähetetty
+  return "SENT"; //Ilmoitetaan, et viesti yritettiin lähettää
 }
 
 void loraFlush()
@@ -174,7 +174,7 @@ int readDownlink(String downmessage)
         return 8;
       }
     }
-
+    ResetPiezo();
     received.trim();
     if(String(received) == "FF1010")
     {
@@ -192,7 +192,6 @@ int readDownlink(String downmessage)
     {
       //In other cases we do not have actions
     }
-    ResetPiezo();
     //if we get here
     return 9;
     

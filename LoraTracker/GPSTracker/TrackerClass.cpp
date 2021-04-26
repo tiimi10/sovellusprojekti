@@ -159,7 +159,7 @@ void trackerRun()
       loraSleep(sleepTime);
       delay(sleepTime);
       Serial.println("laite ei liikkunut lainkaan");
-      timeCounter = 0;
+      timeCounter = millis();
       nomovement = true;
     }
   }

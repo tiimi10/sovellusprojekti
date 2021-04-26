@@ -18,19 +18,18 @@ void piezoSetup()
 bool movementTest()
 {
   int piezoValue= analogRead(PIEZO_PIN);
-  int piezoTest = piezoValue / 1023.0 * 5000.0;
+  int piezoTest = piezoValue*5000 / 1023;
   if(piezoTest > 6)
   {
-    Filtering(piezoValue);
+    Filtering(piezoTest);
     return true;
   }
   
   return false;
 }
 
-void Filtering(int piezoADC)
+void Filtering(int piezoV)
 {
-  float piezoV = piezoADC / 1023.0 * 5000.0;
   if(469 < piezoV)
   {
     Values1 ++;
