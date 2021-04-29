@@ -6,7 +6,7 @@
 #endif //ends header
 
 void piezoSetup();
-void Filtering(int piezoADC);
+void Filtering(int piezoV);
 void ResetPiezo();
 int Roadcondition();
 bool movementTest();

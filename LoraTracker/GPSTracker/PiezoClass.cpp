@@ -18,8 +18,9 @@ void piezoSetup()
 bool movementTest()
 {
   int piezoValue= analogRead(PIEZO_PIN);
-  int piezoTest = piezoValue*5000 / 1023;
-  if(piezoTest > 6)
+  int piezoTest = piezoValue/1023.0*5000.0;
+
+  if(piezoTest > 30)
   {
     Filtering(piezoTest);
     return true;
@@ -67,7 +68,7 @@ void Filtering(int piezoV)
     Values1 ++;
     Values2 ++;
   }
-  else if(6 < piezoV)
+  else if(20 < piezoV)
   {
     Values1 ++;
   }
@@ -89,10 +90,11 @@ int Roadcondition()
 
 void ResetPiezo()
 {
-  int Values1 = 0;
-  int Values2 = 0;
-  int Values3 = 0;
-  int Values4 = 0;
-  int Values5 = 0;
-  int Values6 = 0;
+  Serial.println("Roadcondition reseted");
+  Values1 = 0;
+  Values2 = 0;
+  Values3 = 0;
+  Values4 = 0;
+  Values5 = 0;
+  Values6 = 0;
 }

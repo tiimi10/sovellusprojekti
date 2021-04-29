@@ -27,9 +27,9 @@ void loraSetup()
   pinMode(resetPin, OUTPUT);
   loraSerial.begin(loraBaud); //Loraport
 
-  long retryTimeGeneral = 60000;
 
-  initialize_radio(retryTimeGeneral);
+  //long retryTimeGeneral = 60000;
+  //initialize_radio(retryTimeGeneral);
 
 }
 
@@ -137,7 +137,7 @@ void loraFlush()
 
 void loraSleep(long msTime)
 {
-  myLora.sleep(msTime);
+  //myLora.sleep(msTime);
 }
 
 int readDownlink(String downmessage)
@@ -174,7 +174,7 @@ int readDownlink(String downmessage)
         return 8;
       }
     }
-    ResetPiezo();
+    
     received.trim();
     if(String(received) == "FF1010")
     {
